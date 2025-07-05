@@ -1,0 +1,102 @@
+" Vim with all enhancements
+source $VIMRUNTIME/vimrc_example.vim
+
+" Use the internal diff if available.
+" Otherwise use the special 'diffexpr' for Windows.
+if &diffopt !~# 'internal'
+  set diffexpr=MyDiff()
+endif
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg1 = substitute(arg1, '!', '\!', 'g')
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg2 = substitute(arg2, '!', '\!', 'g')
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let arg3 = substitute(arg3, '!', '\!', 'g')
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  let cmd = substitute(cmd, '!', '\!', 'g')
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+set number
+set mouse=a
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set showtabline=1
+set clipboard=unnamedplus  
+set incsearch
+set hlsearch
+set ruler
+set showcmd
+set wildmenu
+set showmatch
+set completeopt=menuone,noselect
+syntax on
+
+" Leader key
+let mapleader=" "
+
+" Save and Quit shortcuts
+nnoremap <leader>s :w<CR>
+nnoremap <leader>q :wq<CR>
+nnoremap <leader>x :q!<CR>
+
+" Copy Paste shortcuts
+nnoremap <leader>c "+y
+vnoremap <leader>c "+y
+vnoremap <C-c> "+y
+nnoremap <C-c> "+y
+nnoremap <C-p> "+p
+inoremap <C-p> <C-r>+
+cnoremap <C-p> <C-r>+
+tnoremap <C-p> <C-r>+
+nnoremap <leader>v "+p
+nnoremap <leader>V "+P
+inoremap <leader>v <C-r>+
+cnoremap <leader>v <C-r>+
+tnoremap <leader>v <C-r>+
+
+" Tab navigation
+nnoremap <C-S-Right> :tabnext<CR>
+nnoremap <C-S-Left> :tabprev<CR>
+nnoremap <C-t> :vertical terminal<CR>
+
+" Quick search & replace
+nnoremap <leader>r :%s//g<Left><Left>
+
+" Plugin section
+call plug#begin('~/.vim/plugged')
+Plug 'tpope/vim-fugitive'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'preservim/nerdtree'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'sheerun/vim-polyglot'
+Plug 'vim-test/vim-test'
+Plug 'puremourning/vimspector'
+Plug 'mbbill/undotree'
+call plug#end()
+
